@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block mainBody %}
+<div class="main">
+  <v-btn elevation="2"> test</v-btn>
+</div>
+  
+
+{% endblock %}
+
+{% block script %}
+<script>
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      delimiters: ['[[', ']]'],
+      //mixins:[mixinData],
+      data(){
+        return{
+            testData:"123",
+        }
+      }
+    })
+</script>
+{% endblock %}
+
