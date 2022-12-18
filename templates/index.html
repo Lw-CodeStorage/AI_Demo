@@ -1,7 +1,14 @@
 {% extends 'base.html' %}
 {% block mainBody %}
 <div class="main">
-  <v-btn elevation="2"> test123</v-btn>
+  <v-autocomplete
+    v-model="dataset_values"
+    v-bind:items="dataset_items"
+    filled
+    rounded
+    chips
+    deletable-chips
+    label="選擇訓練資料"></v-autocomplete>
 </div>
 {% endblock %}
 
@@ -9,15 +16,38 @@
 <script>
     new Vue({
       el: '#app',
-      vuetify: new Vuetify(),
-      delimiters: ['[[', ']]'],
-      //mixins:[mixinData],
-      data(){
-        return{
-            testData:"123",
+      vuetify: new Vuetify({
+        theme: { dark: true }
+      }),
+      data() {
+        return {
+          testData: '123',
+          dataset_items: ['房價資料'],
+          dataset_values: [],
         }
-      }
+      },
+      created() {
+       
+      },
+      watch:{
+        dataset_values(val){
+          axios.post('./test/',{datasset_name:val})
+          .then((resp) => {
+            let data = resp.data 
+            console.log(data)
+          })
+          .catch((e) => {})
+        }
+      },
+      methods: {
+        getCookie(name = 'csrftoken') {
+          var value = '; ' + document.cookie
+          var parts = value.split('; ' + name + '=')
+          if (parts.length === 2) return parts.pop().split(';').shift()
+        }
+      },
+      delimiters: ['[[', ']]'],
+       //mixins:[mixinData],
     })
-</script>
+  </script>
 {% endblock %}
-
