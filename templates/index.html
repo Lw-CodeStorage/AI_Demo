@@ -8,8 +8,15 @@
     rounded
     chips
     deletable-chips
+    desne
     label="選擇訓練資料"></v-autocomplete>
+    <v-row>
+      <v-col>
+        <div v-html="data_descr"></div>
+      </v-col>
+    </v-row>
 </div>
+
 {% endblock %}
 
 {% block script %}
@@ -24,6 +31,7 @@
           testData: '123',
           dataset_items: ['房價資料'],
           dataset_values: [],
+          data_descr :'123',
         }
       },
       created() {
@@ -34,6 +42,7 @@
           axios.post('./test/',{datasset_name:val})
           .then((resp) => {
             let data = resp.data 
+            this.data_descr = data.descr
             console.log(data)
           })
           .catch((e) => {})

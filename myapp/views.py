@@ -6,6 +6,7 @@ from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt # 跳過Csrf保護
 from django.views.decorators.csrf import csrf_protect # csrf 保護
 from django.views.decorators.csrf import ensure_csrf_cookie # 瀏覽器cookie加入token
+from django.views.decorators.csrf import requires_csrf_token # 这个装饰器类似csrf_protect，一样要进行csrf验证，但是它不会拒绝发送过来的请求。
 import json
 import numpy as np
 import pandas as pd
@@ -18,7 +19,7 @@ def home(request):
     return render(request,"index.html",) 
 
 
-@csrf_exempt
+@requires_csrf_token
 def get_dataset(request):
     resp = {}
     post_data = json.loads(request.body)
@@ -27,9 +28,8 @@ def get_dataset(request):
         boston_data = datasets.load_boston()
         resp["ok"] = True
         resp["descr"] = boston_data.DESCR
-        resp["feature_names"] = "boston_data.feature_names"
-        resp["data"] = "boston_data.data"
-        resp["target"] = [1,2,3]
-    # 看起來是 sklearn 裡面的 numpuy ndarray 轉 json 發生問題   
+        resp["feature_names"] = pd.Series(boston_data.feature_names).tolist()
+        resp["data"] = boston_data.data.tolist()
+        resp["target"] = boston_data.target.tolist()
     return JsonResponse(resp)
   
