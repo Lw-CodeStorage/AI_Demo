@@ -1,15 +1,21 @@
 <head>
+  
+  <title>AI</title>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" />
-  <title>AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1,
+    maximum-scale=1, user-scalable=no, minimal-ui" />
+  <link
+    href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
+    rel="stylesheet" />
+  <link
+    href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css"
+    rel="stylesheet" />
+  <link href="../static/js/node_modules/vuetify/dist/vuetify.min.css"
+    rel="stylesheet" />
+
+
 </head>
 <body style="background-color: rgb(3, 10, 26);position:relative !important;">
   <img style="
@@ -19,9 +25,10 @@
     width:200%;
     z-index: 1;
     " src="./static/image/hero-glow.svg" />
-  <div id="app" >
+  <div id="app">
     <v-app>
-      {% comment %} <v-app-bar app dense dark scroll-off-screen style="z-index: 20;">
+      {% comment %} <v-app-bar app dense dark scroll-off-screen style="z-index:
+        20;">
         <v-app-bar-nav-icon></v-app-bar-nav-icon>
 
         <v-toolbar-title>Collapsing Bar</v-toolbar-title>
@@ -29,18 +36,26 @@
       <v-main style="z-index: 2;">
         <v-container>
           {% block mainBody %}
-            aaa
+          aaa
           {% endblock %}
         </v-container>
       </v-main>
     </v-app>
   </div>
 </body>
-<script>
+
+
+<!-- <script src="../static/js/node_modules/vue/dist/vue.js"></script> -->
+<!-- <script src="../static/js/node_modules/vuetify/dist/vuetify.min.js"></script>
+<script src="../static/js/node_modules/axios/dist/axios.js"></script> -->
+<script type="module">
+  import '../static/js/node_modules/axios/dist/axios.js'
+  import "../static/js/node_modules/vue/dist/vue.min.js";
+  import "../static/js/node_modules/vuetify/dist/vuetify.min.js"
   axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
   axios.defaults.xsrfCookieName = "csrftoken";
   axios.defaults.withCredentials = true;
 </script>
-{% block script %}
 
+{% block script %}
 {% endblock %}

@@ -8,7 +8,8 @@
     rounded
     chips
     deletable-chips
-    desne
+    dense
+    small-chips
     label="選擇訓練資料"></v-autocomplete>
     <v-row>
       <v-col>
@@ -20,7 +21,8 @@
 {% endblock %}
 
 {% block script %}
-<script>
+
+<script type="module">
     new Vue({
       el: '#app',
       vuetify: new Vuetify({
