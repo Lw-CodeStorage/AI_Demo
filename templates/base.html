@@ -14,7 +14,8 @@
     rel="stylesheet" />
   <link href="../static/js/node_modules/vuetify/dist/vuetify.min.css"
     rel="stylesheet" />
-
+  <link href="../static/js/node_modules/ag-grid-community/dist/styles/ag-grid.min.css"/>
+  <link href="../static//js/node_modules/ag-grid-community/dist/styles/ag-theme-alpine-dark.min.css"/>
 
 </head>
 <body style="background-color: rgb(3, 10, 26);position:relative !important;">
@@ -45,13 +46,13 @@
 </body>
 
 
-<!-- <script src="../static/js/node_modules/vue/dist/vue.js"></script> -->
-<!-- <script src="../static/js/node_modules/vuetify/dist/vuetify.min.js"></script>
-<script src="../static/js/node_modules/axios/dist/axios.js"></script> -->
-<script type="module">
-  import '../static/js/node_modules/axios/dist/axios.js'
-  import "../static/js/node_modules/vue/dist/vue.min.js";
-  import "../static/js/node_modules/vuetify/dist/vuetify.min.js"
+<script src="../static/js/node_modules/vue/dist/vue.js"></script>
+<script src="../static/js/node_modules/vuetify/dist/vuetify.min.js"></script>
+<script src="../static/js/node_modules/axios/dist/axios.js"></script> 
+<script src="../static/js/node_modules/ag-grid-community/dist/ag-grid-community.min.js"></script>
+<!-- <script src="../static/js/node_modules/ag-grid-vue/dist/ag-grid-vue.common.js"></script> -->
+<!-- type="module" 有defer特性，此外作用域也是獨立的，但可透過註冊全域達到共用 -->
+<script >
   axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
   axios.defaults.xsrfCookieName = "csrftoken";
   axios.defaults.withCredentials = true;

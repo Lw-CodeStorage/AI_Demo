@@ -26,10 +26,14 @@ def get_dataset(request):
     datasets_name = post_data["datasset_name"]
     if(datasets_name == "房價資料"):
         boston_data = datasets.load_boston()
+        data_df= pd.DataFrame(data=boston_data.data,columns= boston_data.feature_names)
+        data_df["target"] = boston_data.target
+
         resp["ok"] = True
         resp["descr"] = boston_data.DESCR
-        resp["feature_names"] = pd.Series(boston_data.feature_names).tolist()
-        resp["data"] = boston_data.data.tolist()
+        resp["rowdata"]  = data_df.to_json()
+        resp["feature_names"] = pd.Series(boston_data.feature_names).append(pd.Series("TARGET")).tolist()
+        resp["data"] = boston_data.data.tolist() #ndarray need to list
         resp["target"] = boston_data.target.tolist()
     return JsonResponse(resp)
   

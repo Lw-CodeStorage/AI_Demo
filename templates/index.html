@@ -1,39 +1,61 @@
+<!-- 繼承base -->
 {% extends 'base.html' %}
 {% block mainBody %}
 <div class="main">
-  <v-autocomplete
-    v-model="dataset_values"
-    v-bind:items="dataset_items"
-    filled
-    rounded
-    chips
-    deletable-chips
-    dense
-    small-chips
-    label="選擇訓練資料"></v-autocomplete>
+    <div class="my-6">AI_PlayGroud</div>
     <v-row>
-      <v-col>
-        <div v-html="data_descr"></div>
-      </v-col>
+        <v-col class="pb-0" cols="12">
+            <div class="mb-2 ">資料集選擇</div>
+            <v-autocomplete
+                v-model="dataset_values"
+                v-bind:items="dataset_items"
+                filled
+                dense
+                label="選擇訓練資料"></v-autocomplete>
+        </v-col>
+        <v-col
+            v-if="showData"
+            class="pt-0">
+            <v-tabs>
+                <v-tab>Item One</v-tab>
+                <v-tab>Item Two</v-tab>
+                <v-tab>Item Three</v-tab>
+            </v-tabs>
+        </v-col>
+        <v-col cols="12">
+            <div
+                v-if="showData"
+                class="descr_container"
+                v-html="showData.descr"
+                style="white-space: pre;"></div>
+        </v-col>
     </v-row>
 </div>
-
 {% endblock %}
 
 {% block script %}
-
-<script type="module">
+<script>
     new Vue({
       el: '#app',
       vuetify: new Vuetify({
-        theme: { dark: true }
+        theme: {
+           dark: true,
+           themes:{
+            dark:{
+              primary:"#00fff0"
+            }
+           }
+        }
       }),
+      components:{
+       
+      },
       data() {
         return {
           testData: '123',
           dataset_items: ['房價資料'],
           dataset_values: [],
-          data_descr :'123',
+          showData :null,
         }
       },
       created() {
@@ -44,11 +66,14 @@
           axios.post('./test/',{datasset_name:val})
           .then((resp) => {
             let data = resp.data 
-            this.data_descr = data.descr
+            this.showData = data
             console.log(data)
           })
-          .catch((e) => {})
-        }
+          .catch((e) => {
+            console.log(e)
+          })
+        },
+        
       },
       methods: {
         getCookie(name = 'csrftoken') {
@@ -60,5 +85,18 @@
       delimiters: ['[[', ']]'],
        //mixins:[mixinData],
     })
+   
   </script>
+<style scoped>
+  .theme--dark.v-tabs>.v-tabs-bar{
+    background: transparent !important;
+  }
+  .descr_container{
+    background: linear-gradient(45deg, black, transparent);
+    color: #00fff0;
+    padding: 15px;
+    border-radius: 5px;
+  }
+  
+</style>
 {% endblock %}
