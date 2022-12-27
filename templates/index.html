@@ -2,32 +2,32 @@
 {% extends 'base.html' %}
 {% block mainBody %}
 <div class="main">
-    <div class="my-6">AI_PlayGroud</div>
+    <!-- <div class="my-6 text-h3">AI_PlayGroud</div> -->
     <v-row>
         <v-col class="pb-0" cols="12">
-            <div class="mb-2 ">資料集選擇</div>
-            <v-autocomplete
-                v-model="dataset_values"
-                v-bind:items="dataset_items"
-                filled
-                dense
-                label="選擇訓練資料"></v-autocomplete>
+            <!-- <div class="mb-2 ">資料集選擇</div> -->
+            <v-autocomplete clearable v-model="dataset_values" v-bind:items="dataset_items" filled dense label="選擇訓練資料">
+            </v-autocomplete>
         </v-col>
-        <v-col
-            v-if="showData"
-            class="pt-0">
-            <v-tabs>
-                <v-tab>Item One</v-tab>
-                <v-tab>Item Two</v-tab>
-                <v-tab>Item Three</v-tab>
+        <v-col class="pt-0">
+            <v-tabs v-model="tab">
+                <v-tab>資料及描述</v-tab>
+                <v-tab>資料視覺化</v-tab>
+                <v-tab>模型預測</v-tab>
             </v-tabs>
         </v-col>
-        <v-col cols="12">
-            <div
-                v-if="showData"
-                class="descr_container"
-                v-html="showData.descr"
+        <v-col cols="12" v-show="showData.descr && tab == 0" >
+            <div class="descr_container" v-html="showData.descr"
                 style="white-space: pre;"></div>
+        </v-col>
+        <v-col cols="12" v-show="tab==1">
+            <div id="myGrid" style="height:350px;width: 100%;" class="ag-theme-alpine"></div>
+        </v-col>
+        <v-col cols="12" v-show="tab==1">
+            <div id="statistic_gird" style="height:350px;width: 100%;" class="ag-theme-alpine"></div>
+        </v-col>
+        <v-col cols="12">
+            <img v-bind:src="testimage"/>
         </v-col>
     </v-row>
 </div>
@@ -36,67 +36,156 @@
 {% block script %}
 <script>
     new Vue({
-      el: '#app',
-      vuetify: new Vuetify({
-        theme: {
-           dark: true,
-           themes:{
-            dark:{
-              primary:"#00fff0"
+        el: '#app',
+        vuetify: new Vuetify({
+            theme: {
+                dark: false,
+                themes: {
+                    dark: {
+                        primary: "#00ffff"
+                    }
+                }
             }
-           }
-        }
-      }),
-      components:{
-       
-      },
-      data() {
-        return {
-          testData: '123',
-          dataset_items: ['房價資料'],
-          dataset_values: [],
-          showData :null,
-        }
-      },
-      created() {
-       
-      },
-      watch:{
-        dataset_values(val){
-          axios.post('./test/',{datasset_name:val})
-          .then((resp) => {
-            let data = resp.data 
-            this.showData = data
-            console.log(data)
-          })
-          .catch((e) => {
-            console.log(e)
-          })
+        }),
+        data() {
+            return {
+                testData: '123',
+                dataset_items: ['房價資料'],
+                dataset_values: [],
+                showData: {
+                    descr: null
+                },
+                testimage:null,
+                tab: 0,
+                gridOptions: {
+                    // defaultColDef: { sortable: true, filter: true },
+                    rowSelection: 'multiple', // allow rows to be selected
+                    animateRows: true, // have rows animate to new positions when sorted
+                    headerHeight: 35,
+                    rowHeight: 30,
+                    defaultColDef: {
+                        width: 100,
+                        sortable: true,
+                        //editable: true, 
+                        //filter: 'agTextColumnFilter',
+                        resizable: true,
+                        type: 'rightAligned'
+                    },
+                },
+                statistic_gridOptions: {
+                    rowSelection: 'multiple', // allow rows to be selected
+                    animateRows: true, // have rows animate to new positions when sorted
+                    headerHeight: 35,
+                    rowHeight: 30,
+                    defaultColDef: {
+                        width: 100,
+                        sortable: true,
+                        //editable: true, 
+                        //filter: 'agTextColumnFilter',
+                        resizable: true,
+                        type: 'rightAligned'
+                    },
+                }
+            }
         },
-        
-      },
-      methods: {
-        getCookie(name = 'csrftoken') {
-          var value = '; ' + document.cookie
-          var parts = value.split('; ' + name + '=')
-          if (parts.length === 2) return parts.pop().split(';').shift()
-        }
-      },
-      delimiters: ['[[', ']]'],
-       //mixins:[mixinData],
+        created() {
+
+        },
+        mounted() {
+            const GridDiv = document.getElementById("myGrid");
+            new agGrid.Grid(GridDiv, this.gridOptions);
+            const statistic_gird = document.getElementById("statistic_gird");
+            new agGrid.Grid(statistic_gird, this.statistic_gridOptions);
+        },
+        watch: {
+            async dataset_values(val) {
+                await axios.post('./test/', { datasset_name: val })
+                    .then((resp) => {
+                        let data = resp.data
+                        this.showData = data
+                        this.init_table()
+                        this.init_statistic_table()
+                    })
+                    .catch((e) => {
+                        console.error(e)
+                    })
+                await axios.post('./chart/')
+                    .then((resp)=>{
+                        let data = resp.data 
+                        this.testimage = data
+                    })
+            },
+
+        },
+        methods: {
+            init_table() {
+                let columnDefs = this.showData.origin_column.map(column => {
+                    return {
+                        field: column,
+                        pinned: column == "TARGET" ? 'left' : '',
+                        cellStyle: () => {
+                            if (column == "TARGET") {
+                                return { background: "#BADDF9" }
+                            }
+                        },
+                        valueFormatter: (params) => { 
+                             
+                            return params.value.toFixed(2)
+                        },
+                        cellRenderer: (cell) => {
+                            return `<div style="text-align:right">${cell.value}</div>`
+                        }
+                    }
+                })
+                this.gridOptions.columnDefs = columnDefs
+                this.gridOptions.api.setRowData(this.showData.origin_rowdata)
+                this.gridOptions.api.redrawRows()
+                this.gridOptions.api.setColumnDefs(this.gridOptions.columnDefs)
+                //this.gridOptions.columnApi.autoSizeAllColumns()
+            },
+            init_statistic_table() {
+                
+                let columnDefs = this.showData.descript_column.map(column => {
+                    return {
+                        field: column,
+                        pinned: column == "STATISTICS" ? 'left' : '',
+                        valueFormatter: (params) => { 
+                            if(!isNaN(params.value)){
+                                
+                                return params.value.toFixed(2)
+                            }
+                         },
+                        cellStyle: () => {
+                            if (column == "STATISTICS") {
+                                return { background: "#BADDF9" }
+                            }
+                        },
+                        cellRenderer: (cell) => {
+                            return `<div style="text-align:right">${cell.value}</div>`
+                        }
+                    }
+                })
+                this.statistic_gridOptions.columnDefs = columnDefs
+                this.statistic_gridOptions.api.setRowData(this.showData.descript_rowdata)
+                this.statistic_gridOptions.api.redrawRows()
+                this.statistic_gridOptions.api.setColumnDefs(this.statistic_gridOptions.columnDefs)
+            }
+        },
+        delimiters: ['[[', ']]'],
+        //mixins:[mixinData],
     })
-   
-  </script>
+
+</script>
 <style scoped>
-  .theme--dark.v-tabs>.v-tabs-bar{
-    background: transparent !important;
-  }
-  .descr_container{
-    background: linear-gradient(45deg, black, transparent);
-    color: #00fff0;
-    padding: 15px;
-    border-radius: 5px;
-  }
-  
+    .theme--dark.v-tabs>.v-tabs-bar {
+        background: transparent !important;
+    }
+
+    .descr_container {
+       /* background: linear-gradient(45deg, black, transparent); */
+        /* color: #00fff0; */
+        padding: 15px;
+        border-radius: 5px;
+    }
 </style>
 {% endblock %}
