@@ -1,24 +1,23 @@
 <head>
-  
+
   <title>AI</title>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="viewport" content="width=device-width, initial-scale=1,
     maximum-scale=1, user-scalable=no, minimal-ui" />
-  <link
-    href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
-    rel="stylesheet" />
-  <link
-    href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css"
-    rel="stylesheet" />
-  <link href="../static/js/node_modules/vuetify/dist/vuetify.min.css"
-    rel="stylesheet" />
-  <link href="../static/js/node_modules/ag-grid-community/dist/styles/ag-grid.min.css"/>
-  <link href="../static//js/node_modules/ag-grid-community/dist/styles/ag-theme-alpine-dark.min.css"/>
+  <!-- vuetify 基本字體&icon -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet" />
+  <!-- 擴充material icon -->
+  <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
+  <link href="../static/js/node_modules/vuetify/dist/vuetify.min.css" rel="stylesheet" />
+  <link href="../static/js/node_modules/ag-grid-community/dist/styles/ag-grid.min.css" />
+  <link href="../static//js/node_modules/ag-grid-community/dist/styles/ag-theme-alpine-dark.min.css" />
 
 </head>
-<body style="background-color: rgb(3, 10, 26);position:relative !important;">
+
+<body>
   <!-- <img style="
     position:fixed !important;
     top:50%;left: 50%;
@@ -28,14 +27,28 @@
     " src="./static/image/hero-glow.svg" /> -->
   <div id="app">
     <v-app>
-      {% comment %} <v-app-bar app dense dark scroll-off-screen style="z-index:
-        20;">
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
-
+      <!-- <v-app-bar app dense elevation="0" scroll-off-screen >
+        <v-app-bar-nav-icon v-on:click="drawer = !drawer"></v-app-bar-nav-icon>
         <v-toolbar-title>Collapsing Bar</v-toolbar-title>
-      </v-app-bar> {% endcomment %}
-      <v-main style="z-index: 2;">
-        <v-container style="max-width: 1600px;">
+      </v-app-bar> -->
+     
+
+      <v-navigation-drawer app v-model="drawer"  style="background-color: rgb(40, 44, 52);width: 200px;">
+        <v-list dense nav>
+          <v-subheader>數值預測</v-subheader>
+          <v-list-item link>
+            <v-list-item-icon>
+              <v-icon>auto_graph</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title >房價預測</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-navigation-drawer>
+      <div style="width: 100%;height: 40px; background-color: rgb(40, 44, 52);">123</div>
+      <v-main style="background-color: rgb(33,37,50); padding: 20px 0px 0px 200px !important;">
+        <v-container style="max-width: 1500px;">
           {% block mainBody %}
 
           {% endblock %}
@@ -48,16 +61,38 @@
 
 <script src="../static/js/node_modules/vue/dist/vue.js"></script>
 <script src="../static/js/node_modules/vuetify/dist/vuetify.min.js"></script>
-<script src="../static/js/node_modules/axios/dist/axios.js"></script> 
+<script src="../static/js/node_modules/axios/dist/axios.js"></script>
 <script src="../static/js/node_modules/ag-grid-community/dist/ag-grid-community.js"></script>
 
 <!-- <script src="../static/js/node_modules/ag-grid-vue/dist/ag-grid-vue.common.js"></script> -->
 <!-- type="module" 有defer特性，此外作用域也是獨立的，但可透過註冊全域達到共用 -->
-<script >
+<script>
   axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
   axios.defaults.xsrfCookieName = "csrftoken";
   axios.defaults.withCredentials = true;
 </script>
+<style>
+  /* @media screen and (min-width: 1201px) {
+    .self_appbar {
+      left: 200px !important;
+      background-color: rgb(40, 44, 52) !important;
+    }
 
+    .self_main {
+      padding: 40px 0px 0px 200px !important;
+      background-color: rgb(33, 37, 43);
+    }
+  }
+
+  @media screen and (max-width: 1201px) {
+    .self_appbar {
+      background-color: rgb(40, 44, 52) !important;
+    }
+
+    .self_main {
+      background-color: rgb(33, 37, 43) !important;
+    }
+  } */
+</style>
 {% block script %}
 {% endblock %}

@@ -1,8 +1,8 @@
 <!-- 繼承base -->
 {% extends 'base.html' %}
 {% block mainBody %}
-<div class="main">
-    <!-- <div class="my-6 text-h3">AI_PlayGroud</div> -->
+<div>
+
     <v-row>
         <v-col class="pb-0" cols="12">
             <!-- <div class="mb-2 ">資料集選擇</div> -->
@@ -21,13 +21,13 @@
                 style="white-space: pre;"></div>
         </v-col>
         <v-col cols="12" v-show="tab==1">
-            <div id="myGrid" style="height:350px;width: 100%;" class="ag-theme-alpine"></div>
+            <div id="myGrid" style="height:350px;width: 100%;" class="ag-theme-alpine-dark"></div>
         </v-col>
         <v-col cols="12" v-show="tab==1">
-            <div id="statistic_gird" style="height:350px;width: 100%;" class="ag-theme-alpine"></div>
+            <div id="statistic_gird" style="height:350px;width: 100%;" class="ag-theme-alpine-dark"></div>
         </v-col>
         <v-col cols="12">
-            <img v-bind:src="testimage"/>
+            <img v-bind:src="testimage" style="width:100%;"/>
         </v-col>
     </v-row>
 </div>
@@ -39,7 +39,7 @@
         el: '#app',
         vuetify: new Vuetify({
             theme: {
-                dark: false,
+                dark: true,
                 themes: {
                     dark: {
                         primary: "#00ffff"
@@ -49,7 +49,7 @@
         }),
         data() {
             return {
-                testData: '123',
+                drawer: true,
                 dataset_items: ['房價資料'],
                 dataset_values: [],
                 showData: {

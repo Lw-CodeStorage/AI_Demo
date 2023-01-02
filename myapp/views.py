@@ -50,6 +50,7 @@ def get_dataset(request):
 @requires_csrf_token
 def box(title='探索性数据分析箱型图'):
     #matplotlib.use('Agg')  # 不出现画图的框
+    sns.set_style("darkgrid")
     plt.rcParams['font.sans-serif'] = ['SimHei']  # 这两行用来显示汉字
     plt.rcParams['axes.unicode_minus'] = False
     # 關係分布
