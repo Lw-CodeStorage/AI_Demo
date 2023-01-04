@@ -17,7 +17,6 @@ from io import BytesIO
 import matplotlib
 matplotlib.use('SVG')
 import matplotlib.pyplot as plt
-
 import seaborn as sns
 
 boston_data = datasets.load_boston()
@@ -51,7 +50,7 @@ def get_dataset(request):
 
 @requires_csrf_token
 def data_distributed(request):
-    data_df.hist(alpha=0.6,figsize=(6,6))
+    data_df.hist(alpha=0.6,figsize=(10,10))
     plt.tight_layout()
     sio = BytesIO()
     plt.savefig(sio, format='png', bbox_inches='tight', pad_inches=0.0)
