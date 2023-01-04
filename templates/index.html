@@ -2,8 +2,7 @@
 {% extends 'base.html' %}
 {% block mainBody %}
 <div>
-
-    <v-row>
+    <v-row v-show="!loading">
         <v-col class="pb-0" cols="12">
             <!-- <div class="mb-2 ">資料集選擇</div> -->
             <v-autocomplete clearable v-model="dataset_values" v-bind:items="dataset_items" filled dense label="選擇訓練資料">
@@ -12,14 +11,15 @@
         <v-col class="pt-0">
             <v-tabs v-model="tab">
                 <v-tab>資料及描述</v-tab>
-                <v-tab>資料視覺化</v-tab>
+                <v-tab>可解釋性</v-tab>
                 <v-tab>模型預測</v-tab>
             </v-tabs>
         </v-col>
-        <v-col cols="12" v-show="showData.descr && tab == 0" >
-            <div class="descr_container" v-html="showData.descr"
-                style="white-space: pre;"></div>
+         <!-- tab0 -->
+        <v-col cols="12" v-show="showData.descr && tab == 0">
+            <div class="descr_container" v-html="showData.descr" style="white-space: pre;"></div>
         </v-col>
+        <!-- tab1 -->
         <v-col cols="12" v-show="tab==1">
             <div id="myGrid" style="height:350px;width: 100%;" class="ag-theme-alpine-dark"></div>
         </v-col>
@@ -27,12 +27,17 @@
             <div id="statistic_gird" style="height:350px;width: 100%;" class="ag-theme-alpine-dark"></div>
         </v-col>
         <v-col cols="12">
-            <img v-bind:src="testimage" style="width:100%;"/>
+            <img v-bind:src="distributed_image" style="width:100%;" />
+        </v-col>
+        <v-col cols="12">
+            <img v-bind:src="trend_image" style="width:100%;" />
+        </v-col>
+        <v-col cols="12">
+            <img v-bind:src="pearson_image" style="width:50%;" />
         </v-col>
     </v-row>
 </div>
 {% endblock %}
-
 {% block script %}
 <script>
     new Vue({
@@ -50,12 +55,15 @@
         data() {
             return {
                 drawer: true,
+                loading: false,
                 dataset_items: ['房價資料'],
                 dataset_values: [],
                 showData: {
                     descr: null
                 },
-                testimage:null,
+                distributed_image:null,
+                trend_image: null,
+                pearson_image: null,
                 tab: 0,
                 gridOptions: {
                     // defaultColDef: { sortable: true, filter: true },
@@ -99,7 +107,12 @@
         },
         watch: {
             async dataset_values(val) {
-                await axios.post('./test/', { datasset_name: val })
+                this.loading = true
+                await axios.post('./data_distributed/').then(resp=>{
+                      let data = resp.data
+                      this.distributed_image = data
+                })
+                await axios.post('./get_dataset/', { datasset_name: val })
                     .then((resp) => {
                         let data = resp.data
                         this.showData = data
@@ -110,9 +123,19 @@
                         console.error(e)
                     })
                 await axios.post('./chart/')
-                    .then((resp)=>{
-                        let data = resp.data 
-                        this.testimage = data
+                    .then((resp) => {
+                        let data = resp.data
+                        this.trend_image = data
+                    }).catch((e) => {
+                        console.error(e)
+                    })
+                await axios.post('./chart_pearson/')
+                    .then((resp => {
+                        let data = resp.data
+                        this.pearson_image = data
+                    }))
+                    .finally(() => {
+                        this.loading = false
                     })
             },
 
@@ -125,11 +148,11 @@
                         pinned: column == "TARGET" ? 'left' : '',
                         cellStyle: () => {
                             if (column == "TARGET") {
-                                return { background: "#BADDF9" }
+                                return { background: "rgb(40, 44, 52)" }
                             }
                         },
-                        valueFormatter: (params) => { 
-                             
+                        valueFormatter: (params) => {
+
                             return params.value.toFixed(2)
                         },
                         cellRenderer: (cell) => {
@@ -144,20 +167,20 @@
                 //this.gridOptions.columnApi.autoSizeAllColumns()
             },
             init_statistic_table() {
-                
+
                 let columnDefs = this.showData.descript_column.map(column => {
                     return {
                         field: column,
                         pinned: column == "STATISTICS" ? 'left' : '',
-                        valueFormatter: (params) => { 
-                            if(!isNaN(params.value)){
-                                
+                        valueFormatter: (params) => {
+                            if (!isNaN(params.value)) {
+
                                 return params.value.toFixed(2)
                             }
-                         },
+                        },
                         cellStyle: () => {
                             if (column == "STATISTICS") {
-                                return { background: "#BADDF9" }
+                                return { background: "rgb(40, 44, 52)" }
                             }
                         },
                         cellRenderer: (cell) => {
@@ -182,10 +205,14 @@
     }
 
     .descr_container {
-       /* background: linear-gradient(45deg, black, transparent); */
+        /* background: linear-gradient(45deg, black, transparent); */
         /* color: #00fff0; */
         padding: 15px;
         border-radius: 5px;
+    }
+
+    .v-skeleton-loader__bone {
+        background: transparent !important;
     }
 </style>
 {% endblock %}

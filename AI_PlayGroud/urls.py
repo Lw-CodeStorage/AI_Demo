@@ -18,6 +18,8 @@ from django.urls import path
 from myapp import views
 urlpatterns = [
     path('',views.home),
-    path('test/',views.get_dataset),
-    path('chart/',views.box)
+    path('get_dataset/',views.get_dataset),
+    path('data_distributed/',views.data_distributed),
+    path('chart/',views.chart),
+    path('chart_pearson/',views.chart_pearson)
 ]

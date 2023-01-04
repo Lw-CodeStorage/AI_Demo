@@ -31,9 +31,9 @@
         <v-app-bar-nav-icon v-on:click="drawer = !drawer"></v-app-bar-nav-icon>
         <v-toolbar-title>Collapsing Bar</v-toolbar-title>
       </v-app-bar> -->
-     
 
-      <v-navigation-drawer app v-model="drawer"  style="background-color: rgb(40, 44, 52);width: 200px;">
+
+      <v-navigation-drawer app v-model="drawer" style="background-color: rgb(40, 44, 52);width: 200px;">
         <v-list dense nav>
           <v-subheader>數值預測</v-subheader>
           <v-list-item link>
@@ -41,7 +41,7 @@
               <v-icon>auto_graph</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title >房價預測</v-list-item-title>
+              <v-list-item-title>房價預測</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -52,6 +52,14 @@
           {% block mainBody %}
 
           {% endblock %}
+          <template v-show="loading">
+            <v-skeleton-loader v-show="loading" type="image"></v-skeleton-loader>
+            <v-skeleton-loader v-show="loading" type="list-item-three-line divider"></v-skeleton-loader>
+            <v-skeleton-loader v-show="loading" type="article"></v-skeleton-loader>
+            <v-skeleton-loader v-show="loading" type="image"></v-skeleton-loader>
+            <v-skeleton-loader v-show="loading" type="article"></v-skeleton-loader>
+            <v-skeleton-loader v-show="loading" type="list-item-three-line"></v-skeleton-loader>
+          </template>
         </v-container>
       </v-main>
     </v-app>
