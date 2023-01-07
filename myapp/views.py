@@ -50,7 +50,7 @@ def get_dataset(request):
 
 @requires_csrf_token
 def data_distributed(request):
-    data_df.hist(alpha=0.6,figsize=(10,10))
+    data_df.hist(alpha=0.6,figsize=(20,5),layout=(2,7))
     plt.tight_layout()
     sio = BytesIO()
     plt.savefig(sio, format='png', bbox_inches='tight', pad_inches=0.0)
@@ -111,7 +111,7 @@ def chart(request):
 
 @requires_csrf_token
 def chart_pearson(request):
-    sns.set(rc={"figure.figsize":(10,5)})
+    sns.set(rc={"figure.figsize":(10,10)})
     sns.heatmap(data=data_df.corr(),cmap="RdBu", #cmap="Greens"
     annot_kws={"size":12},
     annot=True,
