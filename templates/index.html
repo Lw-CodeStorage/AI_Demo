@@ -15,7 +15,7 @@
                 <v-tab>模型預測</v-tab>
             </v-tabs>
         </v-col>
-         <!-- tab0 -->
+        <!-- tab0 -->
         <v-col cols="12" v-show="showData.descr && tab == 0">
             <div class="descr_container" v-html="showData.descr" style="white-space: pre;"></div>
         </v-col>
@@ -61,7 +61,7 @@
                 showData: {
                     descr: null
                 },
-                distributed_image:null,
+                distributed_image: null,
                 trend_image: null,
                 pearson_image: null,
                 tab: 0,
@@ -108,11 +108,11 @@
         watch: {
             async dataset_values(val) {
                 this.loading = true
-                await axios.post('./data_distributed/').then(resp=>{
-                      let data = resp.data
-                      this.distributed_image = data
+                await axios.post('./data_distributed/', {},{headers: {'X-CSRFToken': this.getCookie('csrftoken')}}).then(resp => {
+                    let data = resp.data
+                    this.distributed_image = data
                 })
-                await axios.post('./get_dataset/', { datasset_name: val })
+                await axios.post('./get_dataset/', { datasset_name: val }, {headers: {'X-CSRFToken': this.getCookie('csrftoken')}})
                     .then((resp) => {
                         let data = resp.data
                         this.showData = data
@@ -122,14 +122,14 @@
                     .catch((e) => {
                         console.error(e)
                     })
-                await axios.post('./chart/')
+                await axios.post('./chart/',{}, {headers: {'X-CSRFToken': this.getCookie('csrftoken')}})
                     .then((resp) => {
                         let data = resp.data
                         this.trend_image = data
                     }).catch((e) => {
                         console.error(e)
                     })
-                await axios.post('./chart_pearson/')
+                await axios.post('./chart_pearson/', {},{headers: {'X-CSRFToken': this.getCookie('csrftoken')}})
                     .then((resp => {
                         let data = resp.data
                         this.pearson_image = data
@@ -192,8 +192,14 @@
                 this.statistic_gridOptions.api.setRowData(this.showData.descript_rowdata)
                 this.statistic_gridOptions.api.redrawRows()
                 this.statistic_gridOptions.api.setColumnDefs(this.statistic_gridOptions.columnDefs)
+            },
+            getCookie(name) {
+                var value = '; ' + document.cookie
+                var parts = value.split('; ' + name + '=')
+                if (parts.length === 2) return parts.pop().split(';').shift()
             }
         },
+        
         delimiters: ['[[', ']]'],
         //mixins:[mixinData],
     })

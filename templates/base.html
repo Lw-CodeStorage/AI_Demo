@@ -75,32 +75,9 @@
 <!-- <script src="../static/js/node_modules/ag-grid-vue/dist/ag-grid-vue.common.js"></script> -->
 <!-- type="module" 有defer特性，此外作用域也是獨立的，但可透過註冊全域達到共用 -->
 <script>
-  axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
-  axios.defaults.xsrfCookieName = "csrftoken";
-  axios.defaults.withCredentials = true;
+  // axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+  // axios.defaults.xsrfCookieName = "csrftoken";
+  // axios.defaults.withCredentials = true;
 </script>
-<style>
-  /* @media screen and (min-width: 1201px) {
-    .self_appbar {
-      left: 200px !important;
-      background-color: rgb(40, 44, 52) !important;
-    }
-
-    .self_main {
-      padding: 40px 0px 0px 200px !important;
-      background-color: rgb(33, 37, 43);
-    }
-  }
-
-  @media screen and (max-width: 1201px) {
-    .self_appbar {
-      background-color: rgb(40, 44, 52) !important;
-    }
-
-    .self_main {
-      background-color: rgb(33, 37, 43) !important;
-    }
-  } */
-</style>
 {% block script %}
 {% endblock %}
