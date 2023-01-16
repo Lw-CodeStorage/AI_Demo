@@ -26,13 +26,13 @@
         <v-col cols="12" v-show="tab==1">
             <div id="statistic_gird" style="height:350px;width: 100%;" class="ag-theme-alpine-dark"></div>
         </v-col>
-        <v-col cols="12">
+        <v-col cols="12" v-show="tab==1">
             <img v-bind:src="distributed_image" style="width:100%;" />
         </v-col>
-        <v-col cols="12">
+        <v-col cols="12" v-show="tab==1">
             <img v-bind:src="trend_image" style="width:100%;" />
         </v-col>
-        <v-col cols="12">
+        <v-col cols="12" v-show="tab==1">
             <img v-bind:src="pearson_image" style="width:50%;" />
         </v-col>
     </v-row>
@@ -79,6 +79,9 @@
                         resizable: true,
                         type: 'rightAligned'
                     },
+                    onGridReady: function (params) {
+                        params.api.sizeColumnsToFit();
+                    }
                 },
                 statistic_gridOptions: {
                     rowSelection: 'multiple', // allow rows to be selected
@@ -93,6 +96,9 @@
                         resizable: true,
                         type: 'rightAligned'
                     },
+                    onGridReady: function (params) {
+                        params.api.sizeColumnsToFit();
+                    }
                 }
             }
         },
@@ -108,11 +114,11 @@
         watch: {
             async dataset_values(val) {
                 this.loading = true
-                await axios.post('./data_distributed/', {},{headers: {'X-CSRFToken': this.getCookie('csrftoken')}}).then(resp => {
+                await axios.post('./data_distributed/', {}, { headers: { 'X-CSRFToken': this.getCookie('csrftoken') } }).then(resp => {
                     let data = resp.data
                     this.distributed_image = data
                 })
-                await axios.post('./get_dataset/', { datasset_name: val }, {headers: {'X-CSRFToken': this.getCookie('csrftoken')}})
+                await axios.post('./get_dataset/', { datasset_name: val }, { headers: { 'X-CSRFToken': this.getCookie('csrftoken') } })
                     .then((resp) => {
                         let data = resp.data
                         this.showData = data
@@ -122,14 +128,14 @@
                     .catch((e) => {
                         console.error(e)
                     })
-                await axios.post('./chart/',{}, {headers: {'X-CSRFToken': this.getCookie('csrftoken')}})
+                await axios.post('./chart/', {}, { headers: { 'X-CSRFToken': this.getCookie('csrftoken') } })
                     .then((resp) => {
                         let data = resp.data
                         this.trend_image = data
                     }).catch((e) => {
                         console.error(e)
                     })
-                await axios.post('./chart_pearson/', {},{headers: {'X-CSRFToken': this.getCookie('csrftoken')}})
+                await axios.post('./chart_pearson/', {}, { headers: { 'X-CSRFToken': this.getCookie('csrftoken') } })
                     .then((resp => {
                         let data = resp.data
                         this.pearson_image = data
@@ -156,7 +162,7 @@
                             return params.value.toFixed(2)
                         },
                         cellRenderer: (cell) => {
-                            return `<div style="text-align:right">${cell.value}</div>`
+                            return `<div style="text-align:right">${cell.value.toFixed(2)}</div>`
                         }
                     }
                 })
@@ -184,7 +190,8 @@
                             }
                         },
                         cellRenderer: (cell) => {
-                            return `<div style="text-align:right">${cell.value}</div>`
+                            debugger
+                            return `<div style="text-align:right">${isNaN(cell.value)?cell.value:cell.value.toFixed(2)}</div>`
                         }
                     }
                 })
@@ -199,7 +206,7 @@
                 if (parts.length === 2) return parts.pop().split(';').shift()
             }
         },
-        
+
         delimiters: ['[[', ']]'],
         //mixins:[mixinData],
     })

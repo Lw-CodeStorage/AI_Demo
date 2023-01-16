@@ -8,16 +8,18 @@ from django.views.decorators.csrf import csrf_protect # csrf 保護
 from django.views.decorators.csrf import ensure_csrf_cookie # 瀏覽器cookie加入token
 from django.views.decorators.csrf import requires_csrf_token # 这个装饰器类似csrf_protect，一样要进行csrf验证，但是它不会拒绝发送过来的请求。
 import json
-import numpy as np
-import pandas as pd
-from sklearn import datasets
-from sklearn import preprocessing 
 import base64
 from io import BytesIO
 import matplotlib
 matplotlib.use('SVG')
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
+import pandas as pd
+from sklearn import datasets
+from sklearn import preprocessing 
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 
 boston_data = datasets.load_boston()
 data_df= pd.DataFrame(data=boston_data.data,columns= boston_data.feature_names)
@@ -53,7 +55,7 @@ def data_distributed(request):
     data_df.hist(alpha=0.6,figsize=(20,5),layout=(2,7))
     plt.tight_layout()
     sio = BytesIO()
-    plt.savefig(sio, format='png', bbox_inches='tight', pad_inches=0.0)
+    plt.savefig(sio, format='png', bbox_inches='tight', pad_inches=0.3)
     data = base64.encodebytes(sio.getvalue()).decode()
     src = 'data:image/png;base64,' + str(data)
     # 记得关闭，不然画出来的图是重复的
@@ -92,15 +94,14 @@ def chart(request):
             y=y,
             x=x[k],
             marker="+", 
-            scatter_kws={"color":"red","alpha":0.3,"s":45},
-            line_kws={"color":"#00ffff","alpha":1,"lw":4},
+            scatter_kws={"color":"blue","alpha":0.3,"s":45},
+            line_kws={"color":"red","alpha":1,"lw":4},
             ax=axs[i]
         )
     #更改 Matplotlib 子圖大小和間距
     fig.tight_layout()
-
     sio = BytesIO()
-    plt.savefig(sio, format='png', bbox_inches='tight', pad_inches=0.0)
+    plt.savefig(sio, format='png', bbox_inches='tight', pad_inches=0.3)
     data = base64.encodebytes(sio.getvalue()).decode()
     src = 'data:image/png;base64,' + str(data)
     # 记得关闭，不然画出来的图是重复的
@@ -111,14 +112,14 @@ def chart(request):
 
 @requires_csrf_token
 def chart_pearson(request):
-    sns.set(rc={"figure.figsize":(10,10)})
+    sns.set(rc={"figure.figsize":(8,8)})
     sns.heatmap(data=data_df.corr(),cmap="RdBu", #cmap="Greens"
     annot_kws={"size":12},
     annot=True,
     fmt=".2f")
-    plt.tight_layout()
+    plt.tight_layout( w_pad=1.0, h_pad=1.0)
     sio = BytesIO()
-    plt.savefig(sio, format='png', bbox_inches='tight', pad_inches=0.0)
+    plt.savefig(sio, format='png', bbox_inches='tight', pad_inches=0.3)
     data = base64.encodebytes(sio.getvalue()).decode()
     src = 'data:image/png;base64,' + str(data)
     # 记得关闭，不然画出来的图是重复的
@@ -126,3 +127,17 @@ def chart_pearson(request):
     resp={}
     resp["data"] = src
     return JsonResponse(src,safe=False)
+
+def train_linear_node(request):
+    resp={}
+    x_train,x_test,y_train,y_test = train_test_split(boston_data.data,boston_data.target,random_state=0)
+    learn_model = LinearRegression()
+    learn_model.fit(x_train,y_train)
+    resp["train_data_score"] = learn_model.score(x_train,y_train)
+    resp["intercept"] = learn_model.intercept_
+    resp["coef"] = learn_model.coef_
+    resp["r2"] = learn_model.score(x_test,y_test)
+    
+    
+
+
