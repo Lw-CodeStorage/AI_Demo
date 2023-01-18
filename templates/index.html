@@ -114,11 +114,11 @@
         watch: {
             async dataset_values(val) {
                 this.loading = true
-                await axios.post('./data_distributed/', {}, { headers: { 'X-CSRFToken': this.getCookie('csrftoken') } }).then(resp => {
+                await axios.post('./data_distributed/', {}).then(resp => {
                     let data = resp.data
                     this.distributed_image = data
                 })
-                await axios.post('./get_dataset/', { datasset_name: val }, { headers: { 'X-CSRFToken': this.getCookie('csrftoken') } })
+                await axios.post('./get_dataset/', { datasset_name: val })
                     .then((resp) => {
                         let data = resp.data
                         this.showData = data
@@ -128,14 +128,14 @@
                     .catch((e) => {
                         console.error(e)
                     })
-                await axios.post('./chart/', {}, { headers: { 'X-CSRFToken': this.getCookie('csrftoken') } })
+                await axios.post('./chart/', {})
                     .then((resp) => {
                         let data = resp.data
                         this.trend_image = data
                     }).catch((e) => {
                         console.error(e)
                     })
-                await axios.post('./chart_pearson/', {}, { headers: { 'X-CSRFToken': this.getCookie('csrftoken') } })
+                await axios.post('./chart_pearson/', {})
                     .then((resp => {
                         let data = resp.data
                         this.pearson_image = data
