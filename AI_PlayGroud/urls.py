@@ -19,11 +19,12 @@ from myapp import views
 from django.views import static ##新增
 from django.conf import settings ##新增
 from django.urls import path,re_path
+from django.conf.urls.static import static
 urlpatterns = [
     path('',views.home),
     path('get_dataset/',views.get_dataset),
     path('data_distributed/',views.data_distributed),
     path('chart/',views.chart),
     path('chart_pearson/',views.chart_pearson),
-    re_path(r'^static/(?P<path>.*)$', static.serve,{'document_root': settings.STATIC_ROOT}, name='static'),
-]
+    # re_path(r'^static/(?P<path>.*)$', static.serve,{'document_root': settings.STATIC_ROOT}, name='static'),
+]#+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) # 給uvicorn

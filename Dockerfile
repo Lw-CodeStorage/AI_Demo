@@ -23,5 +23,6 @@ RUN pip install -r requirements.txt
 # copy project
 COPY . /usr/src/app
 
-CMD python manage.py runserver 0.0.0.0:$PORT 
+#CMD python manage.py runserver 0.0.0.0:$PORT 
 #CMD exec gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 0 AI_PlayGroud.wsgi:application
+CMD exec uvicorn AI_PlayGroud.asgi:application --reload --host 0.0.0.0 --port $PORT

@@ -32,13 +32,16 @@ DEBUG = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
+
 STATIC_URL = '/static/'
-if DEBUG :
-    STATICFILES_DIRS = (
-        os.path.join(BASE_DIR, 'static'),
-    )
+
+if DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static_fake')
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 else:
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static_prod')
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static_fake')]
+
 
 # SECURITY WARNING: It's recommended that you use this when
 # running in production. The URL will be known once you first deploy
@@ -60,12 +63,14 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'AI_PlayGroud.urls'
