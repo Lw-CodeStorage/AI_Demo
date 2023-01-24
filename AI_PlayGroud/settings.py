@@ -27,7 +27,7 @@ env = environ.Env(DEBUG=(bool, True))
 SECRET_KEY = 'django-insecure-(7#2gp^ei2pwoqhhc&22=d4hzcryh3zwnp1@#qiyz0yhk!iag+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 
 # Static files (CSS, JavaScript, Images)

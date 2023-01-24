@@ -20,6 +20,8 @@ from sklearn import datasets
 from sklearn import preprocessing 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
+from sklearn import metrics
+from sklearn.preprocessing import StandardScaler
 
 boston_data = datasets.load_boston()
 data_df= pd.DataFrame(data=boston_data.data,columns= boston_data.feature_names)
@@ -86,6 +88,7 @@ def chart(request):
     "LSTAT"]
     x = data_df.loc[:, column_sels]
     y = data_df["TARGET"]
+    
     x = pd.DataFrame(data=min_max_scaler.fit_transform(x),columns=column_sels)
     fig, axs = plt.subplots(ncols=4, nrows=4, figsize=(16,12))
     axs = axs.flatten()
@@ -128,16 +131,66 @@ def chart_pearson(request):
     resp["data"] = src
     return JsonResponse(src,safe=False)
 
-def train_linear_node(request):
-    resp={}
-    x_train,x_test,y_train,y_test = train_test_split(boston_data.data,boston_data.target,random_state=0)
-    learn_model = LinearRegression()
-    learn_model.fit(x_train,y_train)
-    resp["train_data_score"] = learn_model.score(x_train,y_train)
-    resp["intercept"] = learn_model.intercept_
-    resp["coef"] = learn_model.coef_
-    resp["r2"] = learn_model.score(x_test,y_test)
-    
-    
+#模型訓練
+@requires_csrf_token
+def train(request):
+    post_data = json.loads(request.body)
+    dataset = post_data["dataset"]
+    train_size = post_data["train_size"]
+    model = post_data["model"]
+    if(model == "LinearRegression"):
+        return JsonResponse(linear_model(dataset,train_size))
 
+def linear_model(dataset,train_size):
+    model_info={}
+    scale = StandardScaler() # Z-scaler 物件，負向不會消失
+    if(dataset == "房價資料"):
+        x_train,x_test,y_train,y_test = train_test_split(
+            scale.fit_transform(boston_data.data),
+            boston_data.target,
+            train_size=train_size,
+            random_state=0)
 
+        linear_model = LinearRegression()
+        linear_model.fit(x_train,y_train)
+        y_predict = linear_model.predict(x_test)
+        
+        # 預測與實際趨勢圖
+        draw_data = pd.concat([pd.Series(y_test),pd.Series(y_predict)],axis=1)
+        draw_data.columns = ["real","predict"]
+        sns.lmplot(x="real", y="predict",
+            data=draw_data,
+            height=6,
+            aspect=1.2,
+            ci=95)
+        plt.tight_layout()
+        sio = BytesIO()
+        plt.savefig(sio, format='png', bbox_inches='tight', pad_inches=0.3)
+        data = base64.encodebytes(sio.getvalue()).decode()
+        plt.close()
+        imagebase64 = 'data:image/png;base64,' + str(data)
+        model_info["predict_chart"] = imagebase64
+
+        #特徵重要性
+        plt.figure(figsize=(8,6)) 
+        plt.bar(boston_data.feature_names,linear_model.coef_)
+        plt.tight_layout()
+        sio = BytesIO()
+        plt.savefig(sio, format='png', bbox_inches='tight', pad_inches=0.3)
+        data = base64.encodebytes(sio.getvalue()).decode()
+        plt.close()
+        imagebase64 = 'data:image/png;base64,' + str(data)
+        model_info["coef_chart"] = imagebase64
+       
+
+        #訓練分數
+        model_info["train_data_r2"] = linear_model.score(x_train,y_train)
+        model_info["coef"] = linear_model.coef_.tolist() #ndarray 須轉 list 否則無法轉json
+        #驗證分數
+        model_info["validat_data_mse"] =  metrics.mean_squared_error(y_test, y_predict)
+        model_info["validat_data_rmse"] =  np.sqrt(metrics.mean_squared_error(y_test, y_predict))
+        # score 會將x_test拿去做predict
+        model_info["validat_data_r2"] = linear_model.score(x_test,y_test)
+        
+        return model_info
+    

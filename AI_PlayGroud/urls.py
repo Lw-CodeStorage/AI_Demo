@@ -26,5 +26,6 @@ urlpatterns = [
     path('data_distributed/',views.data_distributed),
     path('chart/',views.chart),
     path('chart_pearson/',views.chart_pearson),
+    path('train/',views.train),
     #re_path(r'^static/(?P<path>.*)$', static.serve,{'document_root': settings.STATIC_ROOT}, name='static'),
 ]#+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
