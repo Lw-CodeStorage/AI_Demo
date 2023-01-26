@@ -19,27 +19,32 @@
         <v-col cols="12" v-show="showData.descr && tab == 0">
             <div class="descr_container" v-html="showData.descr" style="white-space: pre;"></div>
         </v-col>
-        <!-- tab1 -->
-        <v-col cols="12" v-show="tab==1">
+    </v-row>
+    <!-- tab1 -->
+    <v-row v-show="!loading && tab==1 ">
+        <v-col cols="12">
             <div id="myGrid" style="height:350px;width: 100%;" class="ag-theme-alpine-dark"></div>
         </v-col>
-        <v-col cols="12" v-show="tab==1">
+        <v-col cols="12">
             <div id="statistic_gird" style="height:350px;width: 100%;" class="ag-theme-alpine-dark"></div>
         </v-col>
-        <v-col cols="12" v-show="tab==1">
+        <v-col cols="12">
             <img v-bind:src="distributed_image" style="width:100%;" />
         </v-col>
-        <v-col cols="12" v-show="tab==1">
+        <v-col cols="12">
             <img v-bind:src="trend_image" style="width:100%;" />
         </v-col>
-        <v-col cols="12" v-show="tab==1">
+        <v-col cols="12">
             <img v-bind:src="pearson_image" style="width:50%;" />
         </v-col>
-        <v-col cols="12" v-show="tab==2">
+    </v-row>
+
+    <v-row v-show="!loading && tab==2">
+        <v-col cols="12">
             <v-autocomplete v-model="model_value" v-bind:items="model_item" label="選擇訓練模型" chips clearable small-chips
                 deletable-chips></v-autocomplete>
         </v-col>
-        <v-col cols="12" v-show="tab==2">
+        <v-col cols="12">
             <div class="d-flex">
                 <v-slider v-model="slicenum" thumb-label color="orange darken" track-color="green lighten-1"
                     v-bind:label="train_percent"></v-slider>
@@ -49,26 +54,25 @@
             <div>訓練資料筆數 : [[split_train_data]]</div>
             <div>測試資料筆數 : [[showData.origin_rowdata.length-split_train_data]]</div>
         </v-col>
-        <v-col cols="6">
-            <div>使用測試資料集，如果預測房價和實際房價一致的話，那麼所有的資料點都應該彙集在 y = x 這條線上</div>
+        <v-col cols="6" v-show="predict_chart">
+
             <img v-bind:src="predict_chart" style="width:100%;" />
         </v-col>
-        <v-col cols="6">
-            <div>特徵權重</div>
+        <v-col cols="6" v-show="coef_chart">
+
             <img v-bind:src="coef_chart" style="width:100%;" />
         </v-col>
-        <v-col v-show="tab==2">
-            <div> 訓練資料準確度 : [[train_data_r2]]</div>
-            <div> 均方誤差(MSE) : [[validat_data_mse]] </div>
-            <div> 均方根誤差(RMSE) : [[validat_data_rmse]]</div>
-            <div> 判定係數 : [[validat_data_r2]]</div>
-            <div> 特徵權重 : [[coef]] </div>
-            <div> </div>
+        <v-col v-show="train_data_r2">
+            <div> 訓練 : [[train_data_r2]]</div>
+            <div> MSE : [[validat_data_mse]] </div>
+            <div> RMSE : [[validat_data_rmse]]</div>
+            <div> 測試 : [[validat_data_r2]]</div>
         </v-col>
-        <v-col cols="12" v-show="tab==2">
+        <v-col cols="12">
             <v-btn color="blue-grey" v-on:click="train" block>訓練</v-btn>
         </v-col>
     </v-row>
+
 </div>
 {% endblock %}
 {% block script %}
@@ -90,16 +94,16 @@
                 tab: 0,
                 drawer: true,
                 loading: false,
-                dataset_items: ["房價資料"],
+                dataset_items: ["房價資料", "糖尿病資料"],
                 dataset_value: "",
 
                 //資料集描述
                 showData: {
                     descr: null,
-                    origin_column:[],
-                    origin_rowdata:[],
-                    descript_column:[],
-                    descript_rowdata:[],
+                    origin_column: [],
+                    origin_rowdata: [],
+                    descript_column: [],
+                    descript_rowdata: [],
                 },
 
                 //EDA
@@ -144,17 +148,16 @@
 
                 //模型預測
                 slicenum: 70,
-                model_item: ["LinearRegression", "PolynomialRegression", "LassoRegression"],
+                model_item: ["LinearRegression", "PolynomialRegression", "LassoRegression", "MLP"],
                 model_value: "LinearRegression",
-                coef: [],
                 train_data_r2: 0,
-                validat_data_mse:0,
-                validat_data_rmse:0,
+                validat_data_mse: 0,
+                validat_data_rmse: 0,
                 validat_data_r2: 0,
-                predict_chart:null,
-                coef_chart:null,
-                
-               
+                predict_chart: null,
+                coef_chart: null,
+
+
             }
         },
         computed: {
@@ -164,10 +167,10 @@
             test_percent() {
                 return `測試 ${100 - this.slicenum} %`
             },
-            split_train_data(){
+            split_train_data() {
                 let data_length = this.showData.origin_rowdata.length
                 //debugger
-                return Math.floor(this.slicenum/100 * data_length)
+                return Math.floor(this.slicenum / 100 * data_length)
             }
         },
         created() {
@@ -181,36 +184,32 @@
         },
         watch: {
             async dataset_value(val) {
+                    //訓練資料
+                    this.train_data_r2 = null
+                    this.validat_data_mse = null
+                    this.validat_data_rmse = null
+                    this.validat_data_r2 = null
+                    //圖表
+                    this.predict_chart = null
+                    this.coef_chart = null
                 this.loading = true
-                await axios.post('./data_distributed/', {}).then(resp => {
-                    let data = resp.data
-                    this.distributed_image = data
-                })
                 await axios.post('./get_dataset/', { datasset_name: val })
                     .then((resp) => {
                         let data = resp.data
                         this.showData = data
+                        this.distributed_image = data.distributed_image
+                        this.trend_image = data.trend_image
+                        this.pearson_image = data.pearson_image
                         this.init_table()
                         this.init_statistic_table()
                     })
                     .catch((e) => {
                         console.error(e)
                     })
-                await axios.post('./chart/', {})
-                    .then((resp) => {
-                        let data = resp.data
-                        this.trend_image = data
-                    }).catch((e) => {
-                        console.error(e)
-                    })
-                await axios.post('./chart_pearson/', {})
-                    .then((resp => {
-                        let data = resp.data
-                        this.pearson_image = data
-                    }))
                     .finally(() => {
                         this.loading = false
                     })
+
             },
 
         },
@@ -226,11 +225,14 @@
                             }
                         },
                         valueFormatter: (params) => {
+                            if (!isNaN(params.value)) {
 
-                            return params.value.toFixed(2)
+                                return params.value.toFixed(2)
+                            }
                         },
                         cellRenderer: (cell) => {
-                            return `<div style="text-align:right">${cell.value.toFixed(2)}</div>`
+                            return `<div style="text-align:right">${isNaN(cell.value) ? cell.value : cell.value.toFixed(2)
+                                }</div>`
                         }
                     }
                 })
@@ -270,17 +272,17 @@
             },
             train() {
                 axios.post('./train/', {
-                    train_size:  this.slicenum/100,
+                    train_size: this.slicenum / 100,
                     dataset: this.dataset_value,
-                    model: this.model_value
+                    model_name: this.model_value
                 }).then(resp => {
                     let data = resp.data
-                    debugger
+                    //訓練資料
                     this.train_data_r2 = data.train_data_r2
                     this.validat_data_mse = data.validat_data_mse
                     this.validat_data_rmse = data.validat_data_rmse
                     this.validat_data_r2 = data.validat_data_r2
-                    this.coef = data.coef
+                    //圖表
                     this.predict_chart = data.predict_chart
                     this.coef_chart = data.coef_chart
                 })

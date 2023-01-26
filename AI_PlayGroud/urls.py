@@ -23,8 +23,7 @@ from django.urls import path,re_path
 urlpatterns = [
     path('',views.home),
     path('get_dataset/',views.get_dataset),
-    path('data_distributed/',views.data_distributed),
-    path('chart/',views.chart),
+    
     path('chart_pearson/',views.chart_pearson),
     path('train/',views.train),
     #re_path(r'^static/(?P<path>.*)$', static.serve,{'document_root': settings.STATIC_ROOT}, name='static'),
