@@ -21,7 +21,7 @@ from sklearn import preprocessing
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import Lasso
+from sklearn.linear_model import LassoCV
 from sklearn.neural_network import MLPRegressor # neural network
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import PolynomialFeatures
@@ -198,6 +198,7 @@ def linear_model(dataset_name,train_size,model_name):
         model = LinearRegression()
         model.fit(x_train,y_train)
         y_predict = model.predict(x_test)
+
         model_predict_chart2(resp,y_test,y_predict)
         model_feature_chart(dataset,resp,model)
         model_score(resp,x_train,x_test,y_train,y_test,model, y_predict )
@@ -206,14 +207,15 @@ def linear_model(dataset_name,train_size,model_name):
         model = make_pipeline(PolynomialFeatures(2),LinearRegression())
         model.fit(x_train,y_train)
         y_predict = model.predict(x_test)
+
         model_predict_chart2(resp,y_test,y_predict)
         # model_feature_chart(resp,model['linearregression'])
         model_score(resp,x_train,x_test,y_train,y_test,model, y_predict )
     elif(model_name == "LassoRegression"):
-        model = Lasso(alpha=0.2)
+        model = LassoCV(eps=0.001,n_alphas=100,cv=10)
         model.fit(x_train,y_train)
         y_predict = model.predict(x_test)
-        #model_predict_chart(resp,y_test,y_predict)
+
         model_predict_chart2(resp,y_test,y_predict)
         model_feature_chart(dataset,resp,model)
         model_score(resp,x_train,x_test,y_train,y_test,model, y_predict )
@@ -221,6 +223,7 @@ def linear_model(dataset_name,train_size,model_name):
         model  = MLPRegressor(max_iter=500)
         model.fit(x_train,y_train)
         y_predict = model.predict(x_test)
+        
         model_predict_chart2(resp,y_test,y_predict)
         #model_feature_chart(resp,model)
         model_score(resp,x_train,x_test,y_train,y_test,model, y_predict )
